@@ -5,7 +5,8 @@
   {registered, []},
   {applications, [
                   kernel,
-                  stdlib
+                  stdlib,
+                  mnesia
                  ]},
   {mod, { erl_mnesia_app, []}},
   {env, []}
