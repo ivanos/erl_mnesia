@@ -1,6 +1,8 @@
 -module(erl_mnesia).
 -behaviour(gen_server).
 
+-define(TABLE_TIMEOUT, 5000).
+
 %% ------------------------------------------------------------------
 %% API Function Exports
 %% ------------------------------------------------------------------
@@ -36,6 +38,7 @@ init(_) ->
 
 handle_call({tables, TableDefs}, _From, State) ->
     ok = maybe_tables(TableDefs),
+    ok = wait_for_tables(TableDefs),
     {reply, ok, State};
 handle_call(Request, _From, State) ->
     {stop, {unimplemented, call, Request}, State}.
@@ -97,3 +100,7 @@ maybe_table(_, _, true) ->
 maybe_table(Name, Def, false) ->
     {atomic, ok} = mnesia:create_table(Name, Def),
     ok.
+
+wait_for_tables(TableDefs) ->
+    Tables = proplists:get_keys(TableDefs),
+    ok = mnesia:wait_for_tables(Tables, ?TABLE_TIMEOUT).
